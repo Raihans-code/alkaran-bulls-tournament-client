@@ -5,7 +5,7 @@ export default function Landing() {
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-5 py-12">
         <div className="mb-8 flex items-center gap-3">
-          <img src="/brand-mark.svg" alt="Alkaran Bulls" className="h-12 w-12 rounded-xl" />
+          <img src="/bulls-logo.svg" alt="Alkaran Bulls" className="h-12 w-12 rounded-xl" />
           <span className="font-display text-2xl font-bold">Alkaran Bulls</span>
         </div>
         <p className="num text-[clamp(4rem,16vw,9rem)] font-extrabold leading-[0.9] text-gold">LIVE</p>

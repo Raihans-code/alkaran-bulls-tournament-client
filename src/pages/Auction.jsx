@@ -10,7 +10,6 @@ import { Avatar, Badge, Button, Card, ConfirmDialog, Empty, Field, PageHeader, P
 import BidList from '../components/BidList.jsx';
 import { CATEGORY_LABEL, dateTime, taka } from '../utils/format.js';
 
-/* ---------- Stage: the big presentation of the player currently on the block ---------- */
 function Stage({ state, flash, big }) {
   const a = state?.auction;
   const last = state?.lastResult;
@@ -51,7 +50,6 @@ function Stage({ state, flash, big }) {
   );
 }
 
-/* ---------- Admin console ---------- */
 function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
   const toast = useToast();
   const [playerId, setPlayerId] = useState('');
@@ -131,7 +129,6 @@ function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
   );
 }
 
-/* ---------- Team owner bidding panel ---------- */
 function OwnerPanel({ state, myTeams, bid, user }) {
   const toast = useToast();
   const [teamId, setTeamId] = useState(myTeams[0]?.id ?? '');
@@ -187,7 +184,6 @@ function OwnerPanel({ state, myTeams, bid, user }) {
   );
 }
 
-/* ---------- Team purses (visible to everyone) ---------- */
 function TeamsStrip({ teams, myTeamIds }) {
   if (!teams?.length) return null;
   return (
@@ -229,7 +225,6 @@ function BigScreen({ state, flash, teams, onClose }) {
   );
 }
 
-/* ---------- Page ---------- */
 export default function Auction({ admin }) {
   const { user, isAdmin, isOwner } = useAuth();
   const { seasonId, season } = useSeason();

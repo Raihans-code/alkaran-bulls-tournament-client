@@ -9,7 +9,7 @@ export function AuthShell({ title, children, footer }) {
     <div className="grid min-h-screen place-items-center px-4 py-10">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-6 flex items-center gap-3">
-          <img src="/brand-mark.svg" alt="Alkaran Bulls" className="h-11 w-11 rounded-lg" />
+          <img src="/bulls-logo.svg" alt="Alkaran Bulls" className="h-11 w-11 rounded-lg" />
           <span className="font-display text-2xl font-bold">Alkaran Bulls</span>
         </Link>
         <div className="card !p-6">
