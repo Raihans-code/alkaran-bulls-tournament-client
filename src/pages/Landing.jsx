@@ -17,6 +17,7 @@ export default function Landing() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/matches" className="btn-primary px-6 py-3 text-base">View matches</Link>
           <Link to="/login" className="btn-ghost px-6 py-3 text-base">Log in</Link>
+          <Link to="/register" className="btn-ghost px-6 py-3 text-base">Create account</Link>
         </div>
       </div>
     </div>
