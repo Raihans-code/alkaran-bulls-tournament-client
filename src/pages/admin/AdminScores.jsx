@@ -11,6 +11,8 @@ const BALLS = [
   ['0', { runs: 0 }], ['1', { runs: 1 }], ['2', { runs: 2 }], ['3', { runs: 3 }], ['4', { runs: 4 }], ['6', { runs: 6 }],
   ['Wd', { runs: 0, extraType: 'WD' }], ['Nb', { runs: 0, extraType: 'NB' }], ['Bye', { runs: 1, extraType: 'B' }], ['LB', { runs: 1, extraType: 'LB' }],
 ];
+const RUN_BALLS = BALLS.slice(0, 6);
+const EXTRA_BALLS = BALLS.slice(6);
 
 function StatsEditor({ match, players, onClose }) {
   const toast = useToast();
@@ -66,7 +68,7 @@ function Console({ matchId, seasonId }) {
   useEffect(() => { if (match && !match.innings.some((i) => i.inningsNumber === n)) setN(match.innings.length ? match.innings.at(-1).inningsNumber : 1); }, [match, n]);
   useEffect(() => { setManual(inn ? { runs: inn.runs, wickets: inn.wickets, overs: inn.overs, extras: inn.extras, target: inn.target ?? '' } : null); }, [inn?.id, inn?.updatedAt]);
 
-  const batters = useMemo(() => (squads.data ?? []).filter((p) => p.currentTeamId === inn?.battingTeamId), [squads.data, inn?.battingTeamId]);
+  const batters = useMemo(() => (squads.data ?? []).filter((p) => p.currentTeamId === inn?.battingTeamId && !(inn?.dismissedBatterIds ?? []).includes(p.id)), [squads.data, inn?.battingTeamId, inn?.dismissedBatterIds]);
   const bowlers = useMemo(() => (squads.data ?? []).filter((p) => p.currentTeamId === inn?.bowlingTeamId), [squads.data, inn?.bowlingTeamId]);
   if (!match) return null;
 
@@ -109,13 +111,31 @@ function Console({ matchId, seasonId }) {
         <>
           <Card>
             <h3 className="mb-2 text-2xl font-bold">Ball by ball</h3>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
-              {BALLS.map(([label, body]) => (
-                <Button key={label} variant={['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
-              ))}
-              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true }))}>Wicket</Button>
-              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'STRIKER' }))}>Run out striker</Button>
-              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'NON_STRIKER' }))}>Run out non-striker</Button>
+            <div className="space-y-4">
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist">Runs</div>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                  {RUN_BALLS.map(([label, body]) => (
+                    <Button key={label} variant={['4', '6'].includes(label) ? 'gold' : 'ghost'} className="min-h-12 !py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist">Extras</div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {EXTRA_BALLS.map(([label, body]) => (
+                    <Button key={label} variant="ghost" className="min-h-11 !py-2.5" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-alert">Dismissals</div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <Button variant="danger" className="min-h-11 !py-2.5" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true }))}>Wicket</Button>
+                  <Button variant="danger" className="min-h-11 !py-2.5" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'STRIKER' }))}>Run out striker</Button>
+                  <Button variant="danger" className="min-h-11 !py-2.5" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'NON_STRIKER' }))}>Run out non-striker</Button>
+                </div>
+              </div>
             </div>
             <p className="mt-2 text-xs text-mist">Wide and no-ball add a run without using a ball. Odd runs and the end of an over swap the batters automatically.</p>
           </Card>
@@ -125,7 +145,7 @@ function Console({ matchId, seasonId }) {
               {[['strikerId', 'Striker', batters], ['nonStrikerId', 'Non-striker', batters], ['bowlerId', 'Bowler', bowlers]].map(([key, label, list]) => (
                 <Field key={key} label={label}>
                   <select className="input" value={inn[key] ?? ''} onChange={(e) => run(() => api.scores.updateInnings(matchId, n, { [key]: e.target.value || null }))}>
-                    <option value="">Not set</option>{list.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    <option value="">Not set</option>{list.filter((p) => key === 'strikerId' ? p.id !== inn.nonStrikerId : key === 'nonStrikerId' ? p.id !== inn.strikerId : true).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 </Field>
               ))}
