@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { initials, title } from '../utils/format.js';
 
 export const Button = ({ variant = 'primary', size, className = '', loading, children, ...rest }) => (
@@ -123,9 +123,12 @@ export function ConfirmDialog({ open, title: t, message, confirmLabel = 'Confirm
 }
 
 export function Avatar({ name, src, size = 40, className = '' }) {
+  const defaultSrc = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name || 'Alkaran Bulls')}&backgroundColor=12352f&textColor=f7c948`;
+  const [imageSrc, setImageSrc] = useState(src || defaultSrc);
   const style = { width: size, height: size, fontSize: size * 0.38 };
-  return src ? (
-    <img src={src} alt={name} style={style} className={`rounded-full border border-ink-line object-cover ${className}`} />
+  useEffect(() => setImageSrc(src || defaultSrc), [src, defaultSrc]);
+  return imageSrc ? (
+    <img src={imageSrc} alt={name} onError={() => setImageSrc(imageSrc === defaultSrc ? null : defaultSrc)} style={style} className={`rounded-full border border-ink-line object-cover ${className}`} />
   ) : (
     <span style={style} className={`grid shrink-0 place-items-center rounded-full border-2 border-pitch/60 bg-ink-600 font-display font-bold ${className}`}>{initials(name)}</span>
   );

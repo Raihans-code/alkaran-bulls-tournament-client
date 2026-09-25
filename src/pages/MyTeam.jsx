@@ -4,7 +4,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useFetch } from '../hooks/useFetch.js';
 import { useSocketEvent } from '../hooks/useSocketEvent.js';
 import { api, errorMessage } from '../services/api.js';
-import { Async, Avatar, Button, Card, Empty, Field, Modal, PageHeader, Progress, StatusBadge } from '../components/ui.jsx';
+import { Async, Avatar, Button, Card, Empty, Field, Modal, PageHeader, Progress, Spinner, StatusBadge } from '../components/ui.jsx';
 import { CATEGORY_LABEL, taka } from '../utils/format.js';
 
 function TeamForm({ initial, onSubmit, busy, label }) {
@@ -79,7 +79,7 @@ export default function MyTeam() {
 
             <h2 className="mb-2 mt-6 text-3xl font-bold">Squad</h2>
             <Async state={detail}>
-              {(d) => (
+              {(d) => !d ? <div className="grid place-items-center py-8"><Spinner /></div> : (
                 <ol className="grid gap-2 sm:grid-cols-2">
                   {Array.from({ length: d.maxPlayers }, (_, i) => d.squad[i]).map((s, i) => (
                     <li key={i} className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${s ? 'border-ink-line bg-ink-800' : 'border-dashed border-ink-line text-mist'}`}>
