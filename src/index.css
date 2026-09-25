@@ -20,12 +20,18 @@
   .btn-ghost { @apply btn bg-ink-600 text-slate-100 hover:bg-ink-line; }
   .btn-danger { @apply btn bg-alert text-white hover:brightness-110; }
   .btn-sm { @apply px-3 py-1.5 text-xs; }
-  .card { @apply rounded-xl border border-ink-line bg-ink-800 p-4; }
+  .card { @apply min-w-0 rounded-xl border border-ink-line bg-ink-800 p-4; }
   .input { @apply w-full rounded-lg border border-ink-line bg-ink-900 px-3 py-2 text-sm text-slate-100 placeholder:text-mist/60 focus:border-pitch focus:outline-none; }
   .label { @apply mb-1 block text-xs font-medium text-mist; }
   .th { @apply whitespace-nowrap bg-ink-700 px-3 py-2 text-left text-xs font-semibold text-mist; }
   .td { @apply border-t border-ink-line px-3 py-2.5 text-sm; }
   .num { @apply font-display tabular-nums; }
+}
+
+@media (max-width: 640px) {
+  .card { @apply p-3; }
+  .td { @apply px-2 py-2; }
+  .th { @apply px-2; }
 }
 
 @media (prefers-reduced-motion: reduce) {

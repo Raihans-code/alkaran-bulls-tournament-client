@@ -12,7 +12,7 @@ function SeasonRecords({ seasonId }) {
   const matches = useFetch(() => api.matches.list(seasonId, 'COMPLETED'), [seasonId]);
   return (
     <div className="mt-4 space-y-6 border-t border-ink-line pt-4">
-      <div><h3 className="mb-2 text-2xl font-bold">Final points table</h3><Async state={standings}>{(rows) => <StandingsTable rows={rows} />}</Async></div>
+      <div className="min-w-0"><h3 className="mb-2 text-2xl font-bold">Final points table</h3><Async state={standings}>{(rows) => <StandingsTable rows={rows} />}</Async></div>
       <div>
         <h3 className="mb-2 text-2xl font-bold">Match results</h3>
         <Async state={matches}>{(list) => <div className="grid gap-3 md:grid-cols-2">{list.map((m) => <MatchCard key={m.id} match={m} />)}{!list.length && <p className="text-sm text-mist">No completed matches.</p>}</div>}</Async>
@@ -42,14 +42,14 @@ export default function History() {
             <div className="space-y-3">
               {seasons.map((s) => (
                 <Card key={s.id}>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="mr-auto">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
+                      <div className="mr-auto min-w-0">
                       <div className="font-display text-2xl font-bold">{s.name}</div>
-                      <div className="text-xs text-mist">{s.year} • {s._count.teams} teams • {s._count.players} players • {s._count.matches} matches</div>
+                        <div className="break-words text-xs text-mist">{s.year} • {s._count.teams} teams • {s._count.players} players • {s._count.matches} matches</div>
                     </div>
                     <StatusBadge status={s.status} />
-                    {s.champion && <div className="text-right"><div className="text-xs text-gold">Champions</div><div className="font-semibold">{s.champion.name}</div></div>}
-                    {s.mostExpensive && <div className="text-right"><div className="text-xs text-mist">Top buy</div><div className="text-sm">{s.mostExpensive.player.name} <b className="num text-gold">{taka(s.mostExpensive.price)}</b></div></div>}
+                      {s.champion && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-gold">Champions</div><div className="break-words font-semibold">{s.champion.name}</div></div>}
+                      {s.mostExpensive && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-mist">Top buy</div><div className="break-words text-sm">{s.mostExpensive.player.name} <b className="num whitespace-nowrap text-gold">{taka(s.mostExpensive.price)}</b></div></div>}
                     <Button size="sm" variant="ghost" onClick={() => setOpen(open === s.id ? null : s.id)}>{open === s.id ? 'Hide records' : 'View records'}</Button>
                   </div>
                   {open === s.id && <SeasonRecords seasonId={s.id} />}
