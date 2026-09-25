@@ -77,6 +77,8 @@ function Console({ matchId, seasonId }) {
   };
   const teamName = (id) => (id === match.teamAId ? match.teamA.name : match.teamB.name);
   const locked = inn?.status === 'COMPLETED';
+  const overComplete = inn && inn.balls > 0 && inn.balls % 6 === 0;
+  const bowlerRequired = inn && (!inn.bowlerId || overComplete) && !locked;
 
   return (
     <div className="space-y-4">
@@ -110,7 +112,7 @@ function Console({ matchId, seasonId }) {
             <h3 className="mb-2 text-2xl font-bold">Ball by ball</h3>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
               {BALLS.map(([label, body]) => (
-                <Button key={label} variant={body.wicket ? 'danger' : ['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
+                <Button key={label} variant={body.wicket ? 'danger' : ['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
               ))}
             </div>
             <p className="mt-2 text-xs text-mist">Wide and no-ball add a run without using a ball. Odd runs and the end of an over swap the batters automatically.</p>
@@ -126,6 +128,7 @@ function Console({ matchId, seasonId }) {
                 </Field>
               ))}
             </div>
+            {bowlerRequired && <p className="mt-2 rounded-lg bg-gold/10 p-3 text-sm text-gold">Select a different bowler to start the next over.</p>}
           </Card>
           {manual && (
             <Card>

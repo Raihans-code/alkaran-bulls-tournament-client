@@ -25,7 +25,7 @@ function Stage({ state, flash, big }) {
           <span className="inline-flex items-center gap-2 rounded-full border border-alert/50 bg-alert/15 px-3 py-1 text-xs font-bold text-red-200">
             <span className="h-2 w-2 animate-pulse rounded-full bg-alert" /> LIVE
           </span>
-          <div className="mt-4 flex justify-center"><Avatar name={a.player.name} src={a.player.image} size={big ? 150 : 104} /></div>
+          <div className="mt-4 flex justify-center"><Avatar name={a.player.name} src={a.player.image} size={big ? 260 : 104} className="shadow-2xl" /></div>
           <h2 className={`mt-3 break-words font-bold leading-none ${big ? 'text-7xl' : 'text-3xl sm:text-5xl'}`}>{a.player.name}</h2>
           <div className="mt-2 text-mist"><Badge tone="blue">{CATEGORY_LABEL[a.player.category]}</Badge> <span className="ml-2">Base {taka(a.basePrice)}</span></div>
           <div className={`num mt-4 break-words font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-5xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
@@ -214,8 +214,8 @@ function BigScreen({ state, flash, teams, onClose }) {
     return () => { window.removeEventListener('keydown', onKey); if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {}); };
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-[80] overflow-y-auto bg-ink-950 p-4">
-      <div className="mx-auto grid max-w-[1800px] gap-4 lg:grid-cols-[1fr_420px]">
+    <div className="fixed inset-0 z-[80] min-h-screen overflow-y-auto bg-ink-950 p-4">
+      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1800px] gap-4 lg:grid-cols-[1fr_420px]">
         <Stage state={state} flash={flash} big />
         <div className="space-y-4">
           <Card><h3 className="mb-2 text-3xl font-bold">Recent bids</h3><BidList bids={state?.auction?.bids} limit={6} /></Card>
