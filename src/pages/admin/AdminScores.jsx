@@ -10,7 +10,6 @@ import CompleteMatchModal from '../../components/CompleteMatchModal.jsx';
 const BALLS = [
   ['0', { runs: 0 }], ['1', { runs: 1 }], ['2', { runs: 2 }], ['3', { runs: 3 }], ['4', { runs: 4 }], ['6', { runs: 6 }],
   ['Wd', { runs: 0, extraType: 'WD' }], ['Nb', { runs: 0, extraType: 'NB' }], ['Bye', { runs: 1, extraType: 'B' }], ['LB', { runs: 1, extraType: 'LB' }],
-  ['W', { runs: 0, wicket: true }],
 ];
 
 function StatsEditor({ match, players, onClose }) {
@@ -78,6 +77,7 @@ function Console({ matchId, seasonId }) {
   const teamName = (id) => (id === match.teamAId ? match.teamA.name : match.teamB.name);
   const locked = inn?.status === 'COMPLETED';
   const bowlerRequired = inn && !inn.bowlerId && !locked;
+  const batterRequired = inn && (!inn.strikerId || !inn.nonStrikerId) && !locked;
 
   return (
     <div className="space-y-4">
@@ -111,8 +111,11 @@ function Console({ matchId, seasonId }) {
             <h3 className="mb-2 text-2xl font-bold">Ball by ball</h3>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
               {BALLS.map(([label, body]) => (
-                <Button key={label} variant={body.wicket ? 'danger' : ['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
+                <Button key={label} variant={['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
               ))}
+              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true }))}>Wicket</Button>
+              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'STRIKER' }))}>Run out striker</Button>
+              <Button variant="danger" className="!py-3 text-lg" disabled={busy || locked || bowlerRequired || batterRequired || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { runs: 0, wicket: true, dismissal: 'NON_STRIKER' }))}>Run out non-striker</Button>
             </div>
             <p className="mt-2 text-xs text-mist">Wide and no-ball add a run without using a ball. Odd runs and the end of an over swap the batters automatically.</p>
           </Card>
@@ -128,6 +131,7 @@ function Console({ matchId, seasonId }) {
               ))}
             </div>
             {bowlerRequired && <p className="mt-2 rounded-lg bg-gold/10 p-3 text-sm text-gold">Select a bowler to start the over.</p>}
+            {batterRequired && <p className="mt-2 rounded-lg bg-gold/10 p-3 text-sm text-gold">Select the replacement batter before recording the next ball.</p>}
           </Card>
           {manual && (
             <Card>
