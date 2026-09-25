@@ -16,6 +16,8 @@ export default function Teams({ admin }) {
   const [filter, setFilter] = useState('ALL');
   const [purseModal, setPurseModal] = useState(null);
   const [purse, setPurse] = useState({ value: 0, reason: '' });
+  const [logoModal, setLogoModal] = useState(null);
+  const [logo, setLogo] = useState('');
   const [busy, setBusy] = useState(false);
   const teams = useFetch(() => (seasonId ? api.teams.list(seasonId) : null), [seasonId]);
   useSocketEvent('teams:update', () => teams.reload());
@@ -27,6 +29,11 @@ export default function Teams({ admin }) {
   const savePurse = async () => {
     setBusy(true);
     try { await api.teams.adjustPurse(purseModal.id, { purse: Number(purse.value), reason: purse.reason || undefined }); toast.success('Purse updated'); setPurseModal(null); teams.reload(); }
+    catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
+  };
+  const saveLogo = async () => {
+    setBusy(true);
+    try { await api.teams.update(logoModal.id, { logo: logo || null }); toast.success('Team logo updated'); setLogoModal(null); teams.reload(); }
     catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
   };
 
@@ -62,6 +69,7 @@ export default function Teams({ admin }) {
                         <>
                           {t.registrationStatus !== 'APPROVED' && <Button size="sm" onClick={() => setReg(t, 'APPROVED')}>Approve</Button>}
                           {t.registrationStatus === 'PENDING' && <Button size="sm" variant="danger" onClick={() => setReg(t, 'REJECTED')}>Reject</Button>}
+                          <Button size="sm" variant="ghost" onClick={() => { setLogoModal(t); setLogo(t.logo ?? ''); }}>Edit logo</Button>
                           {t.registrationStatus === 'APPROVED' && <Button size="sm" variant="ghost" onClick={() => { setPurseModal(t); setPurse({ value: t.purse, reason: '' }); }}>Adjust purse</Button>}
                         </>
                       )}
@@ -79,6 +87,12 @@ export default function Teams({ admin }) {
           <Field label="New purse (৳)"><input className="input" type="number" min={0} value={purse.value} onChange={(e) => setPurse({ ...purse, value: e.target.value })} /></Field>
           <Field label="Reason"><input className="input" value={purse.reason} onChange={(e) => setPurse({ ...purse, reason: e.target.value })} /></Field>
           <Button loading={busy} onClick={savePurse}>Save purse</Button>
+        </div>
+      </Modal>
+      <Modal open={!!logoModal} onClose={() => setLogoModal(null)} title={`Edit logo: ${logoModal?.name ?? ''}`}>
+        <div className="space-y-3">
+          <Field label="Logo URL (optional)"><input className="input" type="url" value={logo} onChange={(e) => setLogo(e.target.value)} placeholder="https://…" /></Field>
+          <Button loading={busy} onClick={saveLogo}>Save logo</Button>
         </div>
       </Modal>
     </>
