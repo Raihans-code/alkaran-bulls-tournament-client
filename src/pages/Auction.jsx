@@ -150,6 +150,7 @@ function OwnerPanel({ state, myTeams, bid, user }) {
   };
   const next = state?.nextBid;
   const can = (amt) => a && !full && !isHighest && team.purse >= amt && !busy;
+  const bidAmount = (option) => (a ? a.currentBid + option : null);
 
   return (
     <Card>
@@ -174,9 +175,10 @@ function OwnerPanel({ state, myTeams, bid, user }) {
         </Button>
         {a && !full && !isHighest && (
           <div className="mt-2 grid grid-cols-2 gap-2">
-            {(state?.bidOptions ?? [step, step * 2, step * 5]).map((option) => (
-              <Button key={option} variant="ghost" size="sm" disabled={!can(next + option)} onClick={() => place(next + option)}>+{taka(option)}</Button>
-            ))}
+            {(state?.bidOptions ?? [step, step * 2, step * 5]).map((option) => {
+              const amount = bidAmount(option);
+              return <Button key={option} variant="ghost" size="sm" disabled={!can(amount)} onClick={() => place(amount)}>+{taka(option)}</Button>;
+            })}
           </div>
         )}
       </div>
