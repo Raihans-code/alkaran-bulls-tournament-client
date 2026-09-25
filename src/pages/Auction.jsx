@@ -174,8 +174,8 @@ function OwnerPanel({ state, myTeams, bid, user }) {
         </Button>
         {a && !full && !isHighest && (
           <div className="mt-2 grid grid-cols-2 gap-2">
-            {[2, 5].map((k) => (
-              <Button key={k} variant="ghost" size="sm" disabled={!can(next + step * (k - 1))} onClick={() => place(next + step * (k - 1))}>{taka(next + step * (k - 1))}</Button>
+            {(state?.bidOptions ?? [step, step * 2, step * 5]).map((option) => (
+              <Button key={option} variant="ghost" size="sm" disabled={!can(next + option)} onClick={() => place(next + option)}>+{taka(option)}</Button>
             ))}
           </div>
         )}
