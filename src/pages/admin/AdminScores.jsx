@@ -77,8 +77,7 @@ function Console({ matchId, seasonId }) {
   };
   const teamName = (id) => (id === match.teamAId ? match.teamA.name : match.teamB.name);
   const locked = inn?.status === 'COMPLETED';
-  const overComplete = inn && inn.balls > 0 && inn.balls % 6 === 0;
-  const bowlerRequired = inn && (!inn.bowlerId || overComplete) && !locked;
+  const bowlerRequired = inn && !inn.bowlerId && !locked;
 
   return (
     <div className="space-y-4">
@@ -128,7 +127,7 @@ function Console({ matchId, seasonId }) {
                 </Field>
               ))}
             </div>
-            {bowlerRequired && <p className="mt-2 rounded-lg bg-gold/10 p-3 text-sm text-gold">Select a different bowler to start the next over.</p>}
+            {bowlerRequired && <p className="mt-2 rounded-lg bg-gold/10 p-3 text-sm text-gold">Select a bowler to start the over.</p>}
           </Card>
           {manual && (
             <Card>
