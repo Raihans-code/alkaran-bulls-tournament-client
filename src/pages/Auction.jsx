@@ -87,7 +87,7 @@ function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
           <Field label="Player" hint={`${pool.length} available to auction`}>
             <select className="input" value={playerId} onChange={(e) => setPlayerId(e.target.value)}>
               <option value="">Select player…</option>
-              {pool.map((p) => <option key={p.id} value={p.id}>{p.name} • {CATEGORY_LABEL[p.category]} • {taka(p.basePrice)}{p.status === 'UNSOLD' ? ' (unsold)' : ''}</option>)}
+              {pool.map((p) => <option key={p.id} value={p.id}>{p.name} | {CATEGORY_LABEL[p.category] ?? p.category} | Base {taka(p.basePrice)}{p.status === 'UNSOLD' ? ' (unsold)' : ''}</option>)}
             </select>
           </Field>
           <Button className="w-full" disabled={!playerId} loading={busy} onClick={() => run(() => api.auctions.start({ seasonId, playerId }), 'Auction started')}>Start auction</Button>
