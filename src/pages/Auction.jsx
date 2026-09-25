@@ -26,9 +26,9 @@ function Stage({ state, flash, big }) {
             <span className="h-2 w-2 animate-pulse rounded-full bg-alert" /> LIVE
           </span>
           <div className="mt-4 flex justify-center"><Avatar name={a.player.name} src={a.player.image} size={big ? 150 : 104} /></div>
-          <h2 className={`mt-3 font-bold leading-none ${big ? 'text-7xl' : 'text-4xl sm:text-5xl'}`}>{a.player.name}</h2>
+          <h2 className={`mt-3 break-words font-bold leading-none ${big ? 'text-7xl' : 'text-3xl sm:text-5xl'}`}>{a.player.name}</h2>
           <div className="mt-2 text-mist"><Badge tone="blue">{CATEGORY_LABEL[a.player.category]}</Badge> <span className="ml-2">Base {taka(a.basePrice)}</span></div>
-          <div className={`num mt-4 font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-6xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
+          <div className={`num mt-4 break-words font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-5xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
           <div className="mt-2 text-sm text-mist">Current bid</div>
           <div className={`mt-3 ${big ? 'text-3xl' : 'text-lg'} font-semibold`}>
             {a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}

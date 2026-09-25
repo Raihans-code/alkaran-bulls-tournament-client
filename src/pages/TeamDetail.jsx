@@ -16,7 +16,7 @@ export default function TeamDetail() {
             <div className="flex flex-wrap items-center gap-4">
               <Avatar name={t.name} src={t.logo} size={64} />
               <StatusBadge status={t.registrationStatus} />
-              <div className="ml-auto grid grid-cols-3 gap-6 text-center">
+              <div className="grid w-full grid-cols-1 gap-3 text-center sm:ml-auto sm:w-auto sm:grid-cols-3 sm:gap-6">
                 <div><div className="text-xs text-mist">Purse</div><div className="num text-2xl font-bold text-gold">{taka(t.purse)}</div></div>
                 <div><div className="text-xs text-mist">Spent</div><div className="num text-2xl font-bold">{taka(t.totalSpent)}</div></div>
                 <div><div className="text-xs text-mist">Players</div><div className="num text-2xl font-bold">{t.squadCount} / {t.maxPlayers}</div></div>

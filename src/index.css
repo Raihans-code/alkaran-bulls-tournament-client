@@ -5,7 +5,7 @@
 @layer base {
   html { color-scheme: dark; }
   body {
-    @apply bg-ink-950 text-slate-100 font-sans antialiased;
+    @apply min-w-0 overflow-x-hidden bg-ink-950 text-slate-100 font-sans antialiased;
     background-image: radial-gradient(1200px 500px at 75% -10%, #451d28 0%, transparent 60%);
     background-attachment: fixed;
   }

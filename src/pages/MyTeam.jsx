@@ -61,14 +61,14 @@ export default function MyTeam() {
               <div className="flex flex-wrap items-center gap-4">
                 <Avatar name={team.name} src={team.logo} size={64} />
                 <div className="mr-auto">
-                  <div className="font-display text-4xl font-bold leading-none">{team.name}</div>
+                  <div className="break-words font-display text-3xl font-bold leading-none sm:text-4xl">{team.name}</div>
                   <div className="mt-1"><StatusBadge status={team.registrationStatus} /></div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>Edit team</Button>
               </div>
               {team.registrationStatus === 'PENDING' && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-sm text-gold">Waiting for approval. You'll be able to bid once an admin approves your team.</p>}
               {team.registrationStatus === 'REJECTED' && <p className="mt-3 rounded-lg bg-alert/10 p-3 text-sm text-red-200">This registration was rejected. Contact the organisers.</p>}
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div><div className="text-xs text-mist">Purse left</div><div className="num text-2xl font-bold text-gold">{taka(team.purse)}</div></div>
                 <div><div className="text-xs text-mist">Spent</div><div className="num text-2xl font-bold">{taka(team.totalSpent)}</div></div>
                 <div><div className="text-xs text-mist">Squad</div><div className="num text-2xl font-bold">{team.squadCount} / {team.maxPlayers}</div></div>

@@ -97,7 +97,7 @@ function Console({ matchId, seasonId }) {
         {inn ? (
           <div className="mt-4 text-center">
             <div className="text-sm text-mist">{teamName(inn.battingTeamId)} batting{inn.target ? ` • target ${inn.target}` : ''}</div>
-            <div className="num text-7xl font-extrabold text-gold">{inn.runs}/{inn.wickets}</div>
+            <div className="num text-5xl font-extrabold text-gold sm:text-7xl">{inn.runs}/{inn.wickets}</div>
             <div className="num text-2xl text-mist">{inn.overs} / {match.oversLimit} overs • extras {inn.extras}</div>
             {locked && <p className="mt-1 text-sm text-gold">This innings is complete.</p>}
           </div>
@@ -108,7 +108,7 @@ function Console({ matchId, seasonId }) {
         <>
           <Card>
             <h3 className="mb-2 text-2xl font-bold">Ball by ball</h3>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
               {BALLS.map(([label, body]) => (
                 <Button key={label} variant={body.wicket ? 'danger' : ['4', '6'].includes(label) ? 'gold' : 'ghost'} className="!py-3 text-lg" disabled={busy || locked || match.status === 'UPCOMING'} onClick={() => run(() => api.scores.ball(matchId, n, { wicket: false, ...body }))}>{label}</Button>
               ))}
