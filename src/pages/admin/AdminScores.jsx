@@ -49,7 +49,8 @@ function StatsEditor({ match, players, onClose }) {
           </tbody>
         </table>
       </div>
-      <Button className="mt-3" loading={busy} onClick={save}>Save statistics</Button>
+      <p className="mt-3 text-xs text-mist">Ball-by-ball scoring updates these statistics automatically. Manual edits can be saved for corrections.</p>
+      <Button className="mt-3" loading={busy} onClick={save}>Save corrections</Button>
     </div>
   );
 }
