@@ -79,9 +79,9 @@ export const Stat = ({ label, value, tone }) => (
   </Card>
 );
 
-export const Table = ({ head, children, empty, minWidth = 640 }) => (
+export const Table = ({ head, children, empty }) => (
   <div className="max-w-full overflow-x-auto rounded-xl border border-ink-line [overscroll-behavior-x:contain]">
-    <table className="w-full border-collapse" style={{ minWidth }}>
+    <table className="w-full min-w-[640px] border-collapse">
       <thead><tr>{head.map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
       <tbody>{children}</tbody>
     </table>
