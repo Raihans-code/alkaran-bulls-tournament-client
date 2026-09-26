@@ -4,7 +4,7 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useFetch } from '../hooks/useFetch.js';
 import { useSocketEvent } from '../hooks/useSocketEvent.js';
 import { api, errorMessage } from '../services/api.js';
-import { Async, Avatar, Button, ConfirmDialog, Empty, Field, Modal, PageHeader, StatusBadge, Table } from '../components/ui.jsx';
+import { Async, Avatar, Button, Card, ConfirmDialog, Empty, Field, Modal, PageHeader, StatusBadge, Table } from '../components/ui.jsx';
 import { CATEGORIES, CATEGORY_LABEL, taka, timeOnly } from '../utils/format.js';
 import { csvToPlayers } from '../utils/csv.js';
 
@@ -31,15 +31,51 @@ function PlayerHistory({ playerId }) {
   return (
     <Async state={state}>
       {(p) => (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3"><Avatar name={p.name} src={p.image} size={48} /><div><div className="font-display text-2xl font-bold">{p.name}</div><div className="text-sm text-mist">{CATEGORY_LABEL[p.category]} • Base {taka(p.basePrice)}</div></div></div>
-          {!p.auctions.length && <p className="text-sm text-mist">This player hasn't been auctioned yet.</p>}
-          {p.auctions.map((a) => (
-            <div key={a.id} className="rounded-lg border border-ink-line p-3">
-              <div className="mb-2 flex items-center justify-between text-sm"><StatusBadge status={a.status} /><span className="num text-gold">{a.status === 'SOLD' ? `${a.highestBidTeam?.name} • ${taka(a.currentBid)}` : ''}</span></div>
-              <ul className="text-sm">{a.bids.map((b) => <li key={b.id} className="flex justify-between py-0.5"><span>{b.team.name}</span><span className="num">{taka(b.amount)} <span className="text-xs text-mist">{timeOnly(b.createdAt)}</span></span></li>)}</ul>
-              {!a.bids.length && <p className="text-xs text-mist">No bids.</p>}
+        <div className="space-y-4">
+          <Card className="overflow-hidden border-ink-line bg-ink-900/80 p-0">
+            <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+              <div className="mx-auto shrink-0 sm:mx-0">
+                <Avatar name={p.name} src={p.image} size={88} className="ring-2 ring-pitch/50" />
+              </div>
+              <div className="min-w-0 flex-1 text-center sm:text-left">
+                <div className="font-display text-3xl font-bold leading-none break-words">{p.name}</div>
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm text-mist sm:justify-start">
+                  <span>{CATEGORY_LABEL[p.category]}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span>Base {taka(p.basePrice)}</span>
+                  {p.currentTeam && <><span className="hidden sm:inline">•</span><span>Current team: {p.currentTeam.name}</span></>}
+                </div>
+              </div>
+              <div className="flex justify-center sm:justify-end">
+                <StatusBadge status={p.status} />
+              </div>
             </div>
+          </Card>
+
+          {!p.auctions.length && <p className="rounded-xl border border-dashed border-ink-line p-4 text-sm text-mist">This player hasn't been auctioned yet.</p>}
+          {p.auctions.map((a) => (
+            <Card key={a.id} className="p-3 sm:p-4">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-sm text-mist">
+                  <StatusBadge status={a.status} />
+                  {a.status === 'SOLD' && <span className="num text-gold">{a.highestBidTeam?.name} • {taka(a.currentBid)}</span>}
+                </div>
+                {a.status !== 'SOLD' && <span className="text-xs text-mist">Auction closed</span>}
+              </div>
+
+              {a.bids.length ? (
+                <div className="space-y-2">
+                  {a.bids.map((b) => (
+                    <div key={b.id} className="flex flex-col gap-1 rounded-lg border border-ink-line bg-ink-800/70 p-2 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="font-medium text-white">{b.team.name}</span>
+                      <span className="num text-gold">{taka(b.amount)} <span className="text-xs text-mist">{timeOnly(b.createdAt)}</span></span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-mist">No bids recorded for this auction.</p>
+              )}
+            </Card>
           ))}
         </div>
       )}
