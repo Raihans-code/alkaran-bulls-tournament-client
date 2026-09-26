@@ -3,11 +3,11 @@ import { Card, StatusBadge } from './ui.jsx';
 import { dateTime } from '../utils/format.js';
 
 export function InningsLine({ innings, teamName, big }) {
-  if (!innings) return <div className="text-mist">{teamName}<span className="ml-2 text-sm">yet to bat</span></div>;
+  if (!innings) return <div className="min-w-0 text-mist"><span className="block truncate">{teamName}</span><span className="ml-2 text-sm">yet to bat</span></div>;
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className={`truncate font-semibold ${big ? 'text-2xl' : ''}`}>{teamName}</span>
-      <span className={`num font-bold ${big ? 'text-6xl' : 'text-2xl'}`}>
+    <div className="flex min-w-0 items-baseline justify-between gap-3">
+      <span className={`min-w-0 truncate font-semibold ${big ? 'text-2xl' : ''}`}>{teamName}</span>
+      <span className={`num shrink-0 font-bold ${big ? 'text-6xl' : 'text-2xl'}`}>
         {innings.runs}/{innings.wickets}
         <span className={`ml-2 font-normal text-mist ${big ? 'text-2xl' : 'text-sm'}`}>({innings.overs} ov)</span>
       </span>

@@ -37,7 +37,7 @@ export default function AppLayout() {
             {user && <button className="btn-ghost btn-sm" onClick={() => { logout(); navigate('/login'); }}>Log out</button>}
           </div>
         </div>
-        <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-3 pb-2 sm:px-5" aria-label="Main">
+        <nav className="mx-auto flex max-w-7xl flex-wrap gap-1 px-3 pb-2 sm:px-5" aria-label="Main">
           {items.map(([to, label]) => (
             <NavLink
               key={to}

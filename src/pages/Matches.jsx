@@ -49,9 +49,9 @@ export default function Matches({ admin }) {
     <section className="mb-8">
       <h2 className="mb-3 text-3xl font-bold">{label}</h2>
       {list.length ? (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {list.map((m) => (
-            <div key={m.id}>
+            <div key={m.id} className="min-w-0">
               <MatchCard match={m} />
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {m.status === 'LIVE' && <Link to={`/scoreboard/${m.id}`} className="btn-ghost btn-sm">Live scoreboard</Link>}

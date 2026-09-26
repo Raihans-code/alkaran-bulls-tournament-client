@@ -40,10 +40,10 @@ export const Field = ({ label, hint, children }) => (
 );
 
 export const PageHeader = ({ title: t, subtitle, actions }) => (
-  <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-    <div>
+  <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="min-w-0">
       <h1 className="text-3xl font-bold leading-none sm:text-4xl">{t}</h1>
-      {subtitle && <p className="mt-1.5 text-sm text-mist">{subtitle}</p>}
+      {subtitle && <p className="mt-1.5 max-w-full break-words text-sm text-mist">{subtitle}</p>}
     </div>
     {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
   </div>
@@ -79,9 +79,9 @@ export const Stat = ({ label, value, tone }) => (
   </Card>
 );
 
-export const Table = ({ head, children, empty }) => (
+export const Table = ({ head, children, empty, minWidth = '640px' }) => (
   <div className="max-w-full overflow-x-auto rounded-xl border border-ink-line [overscroll-behavior-x:contain]">
-    <table className="w-full min-w-[640px] border-collapse">
+    <table className="w-full border-collapse" style={{ minWidth }}>
       <thead><tr>{head.map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
       <tbody>{children}</tbody>
     </table>

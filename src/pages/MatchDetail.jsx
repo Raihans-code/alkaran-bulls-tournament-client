@@ -19,15 +19,15 @@ export default function MatchDetail() {
         subtitle={<>Match {match.matchNumber} • {match.venue ?? 'Venue TBA'} • {dateTime(match.scheduledAt)} <span className="ml-2"><StatusBadge status={match.status} /></span></>}
         actions={<Link to={`/scoreboard/${match.id}`} className="btn-primary btn-sm">Big scoreboard</Link>}
       />
-      <Card>
+      <Card className="min-w-0">
         <div className="space-y-2">
-          <InningsLine innings={inningsFor(match, match.teamAId)} teamName={match.teamA.name} />
-          <InningsLine innings={inningsFor(match, match.teamBId)} teamName={match.teamB.name} />
+          <InningsLine innings={inningsFor(match, match.teamAId)} teamName={match.teamA.name} big />
+          <InningsLine innings={inningsFor(match, match.teamBId)} teamName={match.teamB.name} big />
         </div>
         {match.status === 'COMPLETED' && (
           <div className="mt-4 border-t border-ink-line pt-3">
-            <div className="font-display text-2xl font-bold text-gold">{match.resultText}</div>
-            {match.playerOfMatch && <div className="text-sm text-mist">Player of the match: <b className="text-white">{match.playerOfMatch.name}</b></div>}
+            <div className="break-words font-display text-2xl font-bold text-gold">{match.resultText}</div>
+            {match.playerOfMatch && <div className="break-words text-sm text-mist">Player of the match: <b className="text-white">{match.playerOfMatch.name}</b></div>}
           </div>
         )}
       </Card>

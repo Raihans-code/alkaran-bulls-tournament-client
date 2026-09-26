@@ -31,34 +31,34 @@ export default function ViewerHome() {
       <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
         <Card className="border-pitch/30 bg-[radial-gradient(circle_at_80%_0%,#164438_0%,#0b1928_58%,#07101a_100%)]">
           <div className="text-xs uppercase tracking-[0.18em] text-pitch">Follow the action</div>
-          <h2 className="mt-2 font-display text-4xl font-bold">Everything happening this season.</h2>
-          <p className="mt-3 max-w-xl text-mist">Watch the auction, follow every scheduled match, and see the standings update as results come in.</p>
+          <h2 className="mt-2 max-w-full break-words font-display text-3xl font-bold sm:text-4xl">Everything happening this season.</h2>
+          <p className="mt-3 max-w-xl text-sm text-mist sm:text-base">Watch the auction, follow every scheduled match, and see the standings update as results come in.</p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Link to="/matches" className="btn-primary">View schedule</Link>
             <Link to="/auction" className="btn-ghost">Open auction</Link>
           </div>
         </Card>
-        <Card>
-          <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Live auction</h2><Link to="/auction" className="text-sm text-pitch">Details</Link></div>
+        <Card className="min-w-0">
+          <div className="flex min-w-0 items-center justify-between gap-3"><h2 className="text-2xl font-bold">Live auction</h2><Link to="/auction" className="text-sm text-pitch">Details</Link></div>
           {auction ? (
-            <div className="mt-4"><div className="font-display text-3xl font-bold">{auction.player.name}</div><div className="mt-2 text-sm text-mist">Current bid</div><div className="num text-4xl font-bold text-gold">{taka(auction.currentBid)}</div></div>
+            <div className="mt-4 min-w-0"><div className="break-words font-display text-2xl font-bold sm:text-3xl">{auction.player.name}</div><div className="mt-2 text-sm text-mist">Current bid</div><div className="num text-3xl font-bold text-gold sm:text-4xl">{taka(auction.currentBid)}</div></div>
           ) : <p className="mt-3 text-sm text-mist">No player is on the block right now.</p>}
         </Card>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section>
-          <div className="mb-3 flex items-center justify-between"><h2 className="text-2xl font-bold">Schedule</h2><Link to="/matches" className="text-sm text-pitch">See all</Link></div>
+        <section className="min-w-0">
+          <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-2xl font-bold">Schedule</h2><Link to="/matches" className="text-sm text-pitch">See all</Link></div>
           <Async state={matches}>{() => <div className="space-y-3">{upcoming.map((match) => <MatchCard key={match.id} match={match} />)}{!upcoming.length && <p className="text-sm text-mist">No matches scheduled yet.</p>}</div>}</Async>
         </section>
-        <section>
-          <div className="mb-3 flex items-center justify-between"><h2 className="text-2xl font-bold">Points table</h2><Link to="/points-table" className="text-sm text-pitch">Full table</Link></div>
+        <section className="min-w-0">
+          <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-2xl font-bold">Points table</h2><Link to="/points-table" className="text-sm text-pitch">Full table</Link></div>
           <Async state={standings}>{(rows) => <StandingsTable rows={(rows ?? []).slice(0, 5)} compact />}</Async>
         </section>
       </div>
 
-      <section className="mt-8">
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-2xl font-bold">Recent results</h2><Link to="/history" className="text-sm text-pitch">Match history</Link></div>
+      <section className="mt-8 min-w-0">
+        <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-2xl font-bold">Recent results</h2><Link to="/history" className="text-sm text-pitch">Match history</Link></div>
         <div className="grid gap-3 md:grid-cols-3">{results.map((match) => <MatchCard key={match.id} match={match} />)}{!results.length && <p className="text-sm text-mist">No results yet.</p>}</div>
       </section>
     </>

@@ -41,17 +41,19 @@ export default function History() {
             {!seasons.length && <Empty title="No seasons yet" />}
             <div className="space-y-3">
               {seasons.map((s) => (
-                <Card key={s.id}>
-                    <div className="flex min-w-0 flex-wrap items-center gap-3">
+                <Card key={s.id} className="min-w-0">
+                    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
                       <div className="mr-auto min-w-0">
-                      <div className="font-display text-2xl font-bold">{s.name}</div>
+                        <div className="font-display text-2xl font-bold">{s.name}</div>
                         <div className="break-words text-xs text-mist">{s.year} • {s._count.teams} teams • {s._count.players} players • {s._count.matches} matches</div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <StatusBadge status={s.status} />
+                        {s.champion && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-gold">Champions</div><div className="break-words font-semibold">{s.champion.name}</div></div>}
+                        {s.mostExpensive && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-mist">Top buy</div><div className="break-words text-sm">{s.mostExpensive.player.name} <b className="num whitespace-nowrap text-gold">{taka(s.mostExpensive.price)}</b></div></div>}
+                        <Button size="sm" variant="ghost" onClick={() => setOpen(open === s.id ? null : s.id)}>{open === s.id ? 'Hide records' : 'View records'}</Button>
+                      </div>
                     </div>
-                    <StatusBadge status={s.status} />
-                      {s.champion && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-gold">Champions</div><div className="break-words font-semibold">{s.champion.name}</div></div>}
-                      {s.mostExpensive && <div className="min-w-0 text-left sm:text-right"><div className="text-xs text-mist">Top buy</div><div className="break-words text-sm">{s.mostExpensive.player.name} <b className="num whitespace-nowrap text-gold">{taka(s.mostExpensive.price)}</b></div></div>}
-                    <Button size="sm" variant="ghost" onClick={() => setOpen(open === s.id ? null : s.id)}>{open === s.id ? 'Hide records' : 'View records'}</Button>
-                  </div>
                   {open === s.id && <SeasonRecords seasonId={s.id} />}
                 </Card>
               ))}
