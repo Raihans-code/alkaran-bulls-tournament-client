@@ -52,11 +52,12 @@ export default function Players({ admin }) {
   const toast = useToast();
   const fileRef = useRef(null);
   const [filters, setFilters] = useState({ q: '', status: '', category: '' });
-  const [modal, setModal] = useState(null); // {type:'add'|'edit'|'history'|'delete'|'reset', player}
+  const [modal, setModal] = useState(null); // {type:'add'|'edit'|'history'|'delete'|'reset'|'assign', player}
   const [busy, setBusy] = useState(false);
   const params = useMemo(() => ({ seasonId, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v)) }), [seasonId, filters]);
   const list = useFetch(() => (seasonId ? api.players.list(params) : null), [params]);
-  useSocketEvent(['teams:update', 'auction:state'], () => list.reload());
+  const teams = useFetch(() => (seasonId ? api.teams.list(seasonId) : null), [seasonId]);
+  useSocketEvent(['teams:update', 'auction:state'], () => { list.reload(); teams.reload(); });
 
   const act = async (fn, msg) => {
     setBusy(true);
@@ -121,6 +122,8 @@ export default function Players({ admin }) {
                 {admin && (
                   <td className="td"><div className="flex gap-1.5">
                     <Button size="sm" variant="ghost" onClick={() => setModal({ type: 'edit', player: p })}>Edit</Button>
+                    {p.status === 'AVAILABLE' && <Button size="sm" variant="ghost" onClick={() => setModal({ type: 'assign', player: p })}>Assign</Button>}
+                    {p.currentTeam && <Button size="sm" variant="ghost" onClick={() => act(() => api.players.removeFromTeam(p.id), `Removed ${p.name} from ${p.currentTeam.name}`)}>Remove</Button>}
                     {['SOLD', 'UNSOLD', 'WITHDRAWN'].includes(p.status) && <Button size="sm" variant="ghost" onClick={() => setModal({ type: 'reset', player: p })}>Reset</Button>}
                     {p.status === 'AVAILABLE' && <Button size="sm" variant="danger" onClick={() => setModal({ type: 'delete', player: p })}>Delete</Button>}
                   </div></td>
@@ -140,8 +143,38 @@ export default function Players({ admin }) {
       <Modal open={modal?.type === 'history'} onClose={() => setModal(null)} title="Player history" wide>
         {modal?.type === 'history' && <PlayerHistory playerId={modal.player.id} />}
       </Modal>
+      <Modal open={modal?.type === 'assign'} onClose={() => setModal(null)} title={`Assign ${modal?.player?.name ?? ''} to team`}>
+        {modal?.type === 'assign' && (
+          <AssignPlayerForm
+            busy={busy}
+            teams={(teams.data ?? []).filter((t) => t.registrationStatus === 'APPROVED')}
+            onSubmit={async ({ teamId, price }) => {
+              await act(() => api.players.assignToTeam(modal.player.id, { teamId, price }), 'Player assigned');
+            }}
+          />
+        )}
+      </Modal>
       <ConfirmDialog open={modal?.type === 'delete'} danger title="Delete player?" message={`${modal?.player?.name} will be removed from this season.`} confirmLabel="Delete" loading={busy} onClose={() => setModal(null)} onConfirm={() => act(() => api.players.remove(modal.player.id), 'Player deleted')} />
       <ConfirmDialog open={modal?.type === 'reset'} title="Reset player?" message={`${modal?.player?.name} returns to AVAILABLE.${modal?.player?.status === 'SOLD' ? ` ${modal.player.currentTeam?.name} is refunded ${taka(modal.player.soldPrice)} and loses the player.` : ''}`} confirmLabel="Reset player" loading={busy} onClose={() => setModal(null)} onConfirm={() => act(() => api.auctions.resetPlayer(modal.player.id), 'Player reset')} />
     </>
+  );
+}
+
+function AssignPlayerForm({ teams, onSubmit, busy }) {
+  const [teamId, setTeamId] = useState(teams[0]?.id ?? '');
+  const [price, setPrice] = useState(100);
+  const team = teams.find((t) => t.id === teamId);
+
+  return (
+    <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); onSubmit({ teamId, price: Number(price) }); }}>
+      <Field label="Team">
+        <select className="input" value={teamId} onChange={(e) => setTeamId(e.target.value)}>
+          <option value="">Select team…</option>
+          {teams.map((t) => <option key={t.id} value={t.id}>{t.name} • {taka(t.purse)} purse</option>)}
+        </select>
+      </Field>
+      <Field label="Price (৳)"><input className="input" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} /></Field>
+      <Button type="submit" loading={busy} disabled={!team || team.purse < Number(price)}>{!team ? 'Select a team' : team.purse < Number(price) ? 'Insufficient purse' : 'Assign player'}</Button>
+    </form>
   );
 }

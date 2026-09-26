@@ -58,6 +58,8 @@ export const api = {
     create: (b) => post('/players', b),
     update: (id, b) => patch(`/players/${id}`, b),
     remove: (id) => del(`/players/${id}`),
+    assignToTeam: (id, b) => post(`/players/${id}/assign`, b),
+    removeFromTeam: (id) => post(`/players/${id}/remove-from-team`),
     import: (b) => post('/players/import', b),
     exportUrl: (seasonId) => http.get('/players/export', { params: { seasonId }, responseType: 'blob' }).then((r) => r.data),
   },
