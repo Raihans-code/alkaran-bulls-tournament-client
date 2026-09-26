@@ -9,7 +9,10 @@ export const timeOnly = (d) => (d ? new Date(d).toLocaleTimeString('en-GB', { ho
 
 export const initials = (name = '') => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
 
-export const CATEGORY_LABEL = { ICON: 'Icon', BATSMAN: 'Batsman', BOWLER: 'Bowler', ALL_ROUNDER: 'All-Rounder', WICKET_KEEPER: 'Wicket Keeper', GENERAL: 'General' };
+export const CATEGORY_LABEL = {
+  A: 'Tier A', B: 'Tier B', C: 'Tier C', D: 'Tier D', E: 'Tier E', F: 'Tier F', G: 'Tier G', H: 'Tier H', I: 'Tier I', J: 'Tier J', K: 'Tier K', L: 'Tier L', M: 'Tier M', N: 'Tier N', O: 'Tier O', P: 'Tier P', Q: 'Tier Q', R: 'Tier R', S: 'Tier S', T: 'Tier T', U: 'Tier U', V: 'Tier V', W: 'Tier W', X: 'Tier X', Y: 'Tier Y', Z: 'Tier Z',
+  NO_CATEGORY: 'No category',
+};
 export const CATEGORIES = Object.keys(CATEGORY_LABEL);
 export const SEASON_STATUSES = ['UPCOMING', 'REGISTRATION', 'AUCTION', 'RUNNING', 'COMPLETED', 'CANCELLED'];
 export const nrr = (n) => `${n > 0 ? '+' : ''}${(n ?? 0).toFixed(3)}`;

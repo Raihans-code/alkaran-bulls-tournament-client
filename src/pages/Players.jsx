@@ -9,7 +9,7 @@ import { CATEGORIES, CATEGORY_LABEL, taka, timeOnly } from '../utils/format.js';
 import { csvToPlayers } from '../utils/csv.js';
 
 function PlayerForm({ initial, onSubmit, busy }) {
-  const [f, setF] = useState({ name: initial?.name ?? '', basePrice: initial?.basePrice ?? 100, category: initial?.category ?? 'GENERAL', phone: initial?.phone ?? '', image: initial?.image ?? '' });
+  const [f, setF] = useState({ name: initial?.name ?? '', basePrice: initial?.basePrice ?? 100, category: initial?.category ?? 'NO_CATEGORY', phone: initial?.phone ?? '', image: initial?.image ?? '' });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const locked = initial && ['IN_AUCTION', 'SOLD'].includes(initial.status);
   return (
