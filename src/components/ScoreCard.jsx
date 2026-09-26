@@ -23,16 +23,16 @@ export default function MatchCard({ match, to }) {
   const a = inningsFor(match, match.teamAId);
   const b = inningsFor(match, match.teamBId);
   return (
-    <Card>
-      <div className="mb-2 flex items-center justify-between text-xs text-mist">
-        <span>Match {match.matchNumber}{match.venue ? ` • ${match.venue}` : ''}</span>
+    <Card className="min-w-0 overflow-hidden">
+      <div className="mb-2 flex flex-col gap-1 text-xs text-mist sm:flex-row sm:items-center sm:justify-between">
+        <span className="break-words">Match {match.matchNumber}{match.venue ? ` • ${match.venue}` : ''}</span>
         <StatusBadge status={match.status} />
       </div>
-      <Link to={to ?? `/matches/${match.id}`} className="block space-y-1.5">
+      <Link to={to ?? `/matches/${match.id}`} className="block min-w-0 space-y-1.5">
         <InningsLine innings={a} teamName={match.teamA.name} />
         <InningsLine innings={b} teamName={match.teamB.name} />
       </Link>
-      <div className="mt-2 text-xs text-mist">{match.status === 'COMPLETED' ? match.resultText : dateTime(match.scheduledAt)}</div>
+      <div className="mt-2 break-words text-xs text-mist">{match.status === 'COMPLETED' ? match.resultText : dateTime(match.scheduledAt)}</div>
     </Card>
   );
 }

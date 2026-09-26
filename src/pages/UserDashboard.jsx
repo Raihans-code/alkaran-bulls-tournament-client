@@ -46,16 +46,16 @@ export default function UserDashboard() {
       <PageHeader title={season.name} subtitle={<>Season status: <StatusBadge status={season.status} /></>} />
       <Async state={mine}>
         {() => team ? (
-          <div className="grid gap-3 md:grid-cols-4">
-            <Card className="md:col-span-2">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="sm:col-span-2 xl:col-span-2">
               <div className="text-xs text-mist">My team</div>
-              <div className="font-display text-3xl font-bold">{team.name}</div>
+              <div className="font-display text-2xl font-bold sm:text-3xl">{team.name}</div>
               <div className="mt-1"><StatusBadge status={team.registrationStatus} /></div>
               {team.registrationStatus === 'PENDING' && <p className="mt-2 text-sm text-gold">Waiting for admin approval. You can bid once approved.</p>}
             </Card>
             <Card>
               <div className="text-xs text-mist">Squad</div>
-              <div className="num text-3xl font-bold">{team.squadCount} / {team.maxPlayers}</div>
+              <div className="num text-2xl font-bold sm:text-3xl">{team.squadCount} / {team.maxPlayers}</div>
               <div className="mt-2"><Progress value={team.squadCount} max={team.maxPlayers} /></div>
             </Card>
             <Stat label="Remaining purse" value={taka(team.purse)} tone="gold" />
@@ -68,32 +68,37 @@ export default function UserDashboard() {
       </Async>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Current auction</h2><Link to="/auction" className="text-sm text-pitch">Open auction room</Link></div>
+        <Card className="min-w-0 overflow-hidden">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-xl font-bold sm:text-2xl">Current auction</h2>
+            <Link to="/auction" className="text-sm text-pitch">Open auction room</Link>
+          </div>
           {a ? (
-            <div className="mt-3">
-              <div className="font-display text-3xl font-bold">{a.player.name}</div>
-              <div className="mt-2 flex gap-6">
-                <div><div className="text-xs text-mist">Current bid</div><div className="num text-3xl font-bold text-gold">{taka(a.currentBid)}</div></div>
-                <div><div className="text-xs text-mist">Next bid</div><div className="num text-3xl font-bold">{taka(state.nextBid)}</div></div>
+            <div className="mt-3 min-w-0">
+              <div className="break-words font-display text-2xl font-bold sm:text-3xl">{a.player.name}</div>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                <div><div className="text-xs text-mist">Current bid</div><div className="num text-2xl font-bold text-gold sm:text-3xl">{taka(a.currentBid)}</div></div>
+                <div><div className="text-xs text-mist">Next bid</div><div className="num text-2xl font-bold sm:text-3xl">{taka(state.nextBid)}</div></div>
               </div>
               {team && <Button variant="gold" className="mt-3 w-full !py-3" disabled={!canBid} loading={busy} onClick={place}>{canBid ? `BID ${taka(state.nextBid)}` : team.squadFull ? 'Squad full' : 'Bid unavailable'}</Button>}
             </div>
           ) : <p className="mt-2 text-sm text-mist">No player is on the block right now.</p>}
         </Card>
-        <div>
-          <h2 className="mb-2 text-2xl font-bold">Points table</h2>
-          <Async state={standings}>{(rows) => <StandingsTable rows={(rows ?? []).slice(0, 5)} compact highlightTeamIds={(mine.data ?? []).map((t) => t.id)} />}</Async>
+        <div className="min-w-0">
+          <h2 className="mb-2 text-xl font-bold sm:text-2xl">Points table</h2>
+          <div className="min-w-0 overflow-hidden">
+            <Async state={standings}>{(rows) => <StandingsTable rows={(rows ?? []).slice(0, 5)} compact highlightTeamIds={(mine.data ?? []).map((t) => t.id)} />}</Async>
+          </div>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div>
-          <h2 className="mb-2 text-2xl font-bold">Upcoming matches</h2>
+        <div className="min-w-0">
+          <h2 className="mb-2 text-xl font-bold sm:text-2xl">Upcoming matches</h2>
           <div className="space-y-3">{upcoming.map((m) => <MatchCard key={m.id} match={m} />)}{!upcoming.length && <p className="text-sm text-mist">No matches scheduled yet.</p>}</div>
         </div>
-        <div>
-          <h2 className="mb-2 text-2xl font-bold">Recent results</h2>
+        <div className="min-w-0">
+          <h2 className="mb-2 text-xl font-bold sm:text-2xl">Recent results</h2>
           <div className="space-y-3">{results.map((m) => <MatchCard key={m.id} match={m} />)}{!results.length && <p className="text-sm text-mist">No results yet.</p>}</div>
         </div>
       </div>
