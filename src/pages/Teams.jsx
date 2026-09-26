@@ -28,8 +28,15 @@ export default function Teams({ admin }) {
   };
   const savePurse = async () => {
     setBusy(true);
-    try { await api.teams.adjustPurse(purseModal.id, { purse: Number(purse.value), reason: purse.reason || undefined }); toast.success('Purse updated'); setPurseModal(null); teams.reload(); }
-    catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
+    try {
+      const current = Number(purseModal?.purse ?? 0);
+      const next = Number(purse.value);
+      const delta = next - current;
+      await api.teams.adjustPurse(purseModal.id, { delta, reason: purse.reason || undefined });
+      toast.success('Purse updated');
+      setPurseModal(null);
+      teams.reload();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
   };
   const saveLogo = async () => {
     setBusy(true);
