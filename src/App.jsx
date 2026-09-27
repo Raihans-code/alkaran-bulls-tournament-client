@@ -4,6 +4,9 @@ import AppLayout from './layouts/AppLayout.jsx';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ChangePassword from './pages/ChangePassword.jsx';
+import AdminPasswordResets from './pages/admin/AdminPasswordResets.jsx';
 import UserDashboard from './pages/UserDashboard.jsx';
 import ViewerHome from './pages/ViewerHome.jsx';
 import Seasons from './pages/Seasons.jsx';
@@ -43,6 +46,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route element={<AppLayout />}>
         <Route path="/auction" element={<Auction />} />
@@ -53,6 +57,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/dashboard" element={<DashboardHome />} />
           <Route path="/seasons" element={<Seasons />} />
           <Route path="/seasons/:seasonId" element={<SeasonDetail />} />
@@ -77,6 +82,7 @@ export default function App() {
             <Route path="/admin/scores" element={<AdminScores />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/password-resets" element={<AdminPasswordResets />} />
             <Route path="/admin/audit" element={<AdminAudit />} />
           </Route>
         </Route>

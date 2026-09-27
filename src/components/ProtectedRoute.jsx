@@ -7,6 +7,7 @@ export default function ProtectedRoute({ role }) {
   const location = useLocation();
   if (loading) return <div className="grid min-h-screen place-items-center"><Spinner /></div>;
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (user.mustChangePassword && location.pathname !== '/change-password') return <Navigate to="/change-password" replace state={{ from: location.pathname }} />;
   if (role && user.role !== role && !(role === 'OWNER' && user.role === 'ADMIN')) return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 }

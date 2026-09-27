@@ -35,6 +35,8 @@ export const api = {
     login: (b) => post('/auth/login', b),
     register: (b) => post('/auth/register', b),
     me: () => get('/auth/me'),
+    forgotPassword: (b) => post('/auth/forgot-password', b),
+    changePassword: (b) => patch('/auth/change-password', b),
   },
   seasons: {
     list: () => get('/seasons'),
@@ -96,5 +98,8 @@ export const api = {
     audit: (params) => get('/admin/audit-logs', params),
     users: () => get('/admin/users'),
     updateUser: (id, b) => patch(`/admin/users/${id}`, b),
+    passwordResetRequests: () => get('/admin/password-reset-requests'),
+    approvePasswordReset: (id) => patch(`/admin/password-reset-requests/${id}/approve`),
+    rejectPasswordReset: (id) => patch(`/admin/password-reset-requests/${id}/reject`),
   },
 };

@@ -10,7 +10,7 @@ const USER_NAV = [
 const ADMIN_NAV = [
   ['/admin', 'Overview'], ['/admin/seasons', 'Seasons'], ['/admin/teams', 'Teams'], ['/admin/players', 'Players'], ['/admin/auction', 'Auction'],
   ['/admin/matches', 'Matches'], ['/admin/scores', 'Scoring'], ['/points-table', 'Points'], ['/history', 'History'],
-  ['/admin/settings', 'Settings'], ['/admin/users', 'Users'], ['/admin/audit', 'Audit'],
+  ['/admin/settings', 'Settings'], ['/admin/users', 'Users'], ['/admin/password-resets', 'Password resets'], ['/admin/audit', 'Audit'],
 ];
 const PUBLIC_NAV = [['/auction', 'Auction'], ['/matches', 'Schedules']];
 
