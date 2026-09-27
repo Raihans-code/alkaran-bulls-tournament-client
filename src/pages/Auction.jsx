@@ -31,7 +31,7 @@ function Stage({ state, flash, big }) {
           <div className={`num mt-4 break-words font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-5xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
           <div className="mt-2 text-sm text-mist">Current bid</div>
           <div className={`mt-3 ${big ? 'text-3xl' : 'text-lg'} font-semibold`}>
-            {a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
+            {a.highestBidTeam ? <>Selected bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
           </div>
         </div>
       ) : (
@@ -104,15 +104,15 @@ function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
               {teams.map((t) => <option key={t.id} value={t.id}>{t.name} • {taka(t.purse)} purse</option>)}
             </select>
           </Field>
-          <Button variant="gold" className="w-full" disabled={!selectedTeam || selectedTeam.purse < state.nextBid} loading={busy} onClick={placeBid}>
+          <Button variant="gold" className="w-full bg-white py-3 text-ink-950 hover:bg-slate-100 sm:py-4" disabled={!selectedTeam || selectedTeam.purse < state.nextBid} loading={busy} onClick={placeBid}>
             {!selectedTeam ? 'Select a team' : selectedTeam.purse < state.nextBid ? 'Insufficient purse' : `BID ${taka(state.nextBid)} for ${selectedTeam.name}`}
           </Button>
-          <div className="grid grid-cols-3 gap-2">
-            <Button variant="gold" onClick={() => setConfirm('SOLD')} disabled={!state.auction.highestBidTeam}>SOLD</Button>
-            <Button variant="ghost" onClick={() => setConfirm('UNSOLD')}>UNSOLD</Button>
-            <Button variant="ghost" onClick={() => setConfirm('WITHDRAW')}>WITHDRAW</Button>
+          <div className="grid grid-cols-3 gap-3">
+            <Button variant="primary" className="py-3 text-sm font-bold shadow-lg shadow-pitch/25 sm:text-base" onClick={() => setConfirm('SOLD')} disabled={!state.auction.highestBidTeam}>SOLD</Button>
+            <Button variant="ghost" className="border border-ink-line py-3 text-sm font-semibold sm:text-base" onClick={() => setConfirm('UNSOLD')}>UNSOLD</Button>
+            <Button variant="ghost" className="border border-alert/50 py-3 text-sm font-semibold text-red-200 sm:text-base" onClick={() => setConfirm('WITHDRAW')}>WITHDRAW</Button>
           </div>
-          <Button variant="danger" size="sm" className="w-full" onClick={() => setConfirm('CANCEL')}>Cancel auction</Button>
+          <Button variant="danger" className="w-full border border-alert bg-transparent py-3 text-base font-bold text-red-200 hover:bg-alert hover:text-white sm:py-4" onClick={() => setConfirm('CANCEL')}>Cancel auction</Button>
         </div>
       )}
       <ConfirmDialog
@@ -129,59 +129,34 @@ function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
   );
 }
 
-function OwnerPanel({ state, myTeams, bid, user }) {
-  const toast = useToast();
-  const [teamId, setTeamId] = useState(myTeams[0]?.id ?? '');
-  const [busy, setBusy] = useState(false);
-  const team = myTeams.find((t) => t.id === teamId) ?? myTeams[0];
+// Team owners watch the auction exactly like any other viewer: bidding is admin-only,
+// so this panel is read-only for everyone who isn't the auctioneer (see AdminPanel).
+function WatchPanel({ state, myTeams }) {
   const a = state?.auction;
-
-  if (!user) return <Card><Empty title="Sign in to bid">Anyone can watch the auction. Sign in to register a team and place bids.</Empty></Card>;
-  if (!team) return <Card><Empty title="No approved team yet">You can bid once an admin approves your team for this season.</Empty></Card>;
-
-  const full = team.squadFull;
-  const isHighest = a?.highestBidTeam?.id === team.id;
-  const step = state?.bidIncrement ?? 0;
-  const place = async (amount) => {
-    if (busy) return; // guards against rapid double-clicks; the server also rejects duplicates
-    setBusy(true);
-    try { await bid(amount, team.id); }
-    catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
-  };
-  const next = state?.nextBid;
-  const can = (amt) => a && !full && !isHighest && team.purse >= amt && !busy;
-  const bidAmount = (option) => (a ? a.currentBid + option : null);
+  const team = myTeams[0];
 
   return (
     <Card>
-      <h3 className="text-2xl font-bold">My bid</h3>
-      {myTeams.length > 1 && (
-        <select className="input mt-2" value={team.id} onChange={(e) => setTeamId(e.target.value)} aria-label="Bidding team">
-          {myTeams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-        </select>
-      )}
-      <div className="mt-3 flex items-center gap-3"><Avatar name={team.name} src={team.logo} size={40} /><div className="font-display text-xl font-bold">{team.name}</div></div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Purse</div><div className="num text-xl font-bold text-gold">{taka(team.purse)}</div></div>
-        <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Squad</div><div className="num text-xl font-bold">{team.squadCount} / {team.maxPlayers}</div></div>
-      </div>
-      <div className="mt-2"><Progress value={team.squadCount} max={team.maxPlayers} tone={full ? 'gold' : 'green'} /></div>
-      {full && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-center font-display text-xl font-bold text-gold">SQUAD FULL</p>}
-      <div className="mt-4">
-        <div className="text-xs text-mist">Next bid</div>
-        <div className="num text-3xl font-bold">{a ? taka(next) : '-'}</div>
-        <Button variant="gold" className="mt-2 w-full !py-3 text-base" disabled={!can(next)} loading={busy} onClick={() => place(next)}>
-          {!a ? 'Waiting for auction' : full ? 'Squad full' : isHighest ? 'You hold the highest bid' : team.purse < next ? 'Not enough purse' : `BID ${taka(next)}`}
-        </Button>
-        {a && !full && !isHighest && (
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {(state?.bidOptions ?? [step, step * 2, step * 5]).map((option) => {
-              const amount = bidAmount(option);
-              return <Button key={option} variant="ghost" size="sm" disabled={!can(amount)} onClick={() => place(amount)}>+{taka(option)}</Button>;
-            })}
+      <h3 className="text-2xl font-bold">Watching</h3>
+      <p className="mt-1 text-sm text-mist">Only the auctioneer places bids. Sit back and follow along{team ? ` — here's how ${team.name} stands.` : '.'}</p>
+      {team && (
+        <>
+          <div className="mt-3 flex items-center gap-3"><Avatar name={team.name} src={team.logo} size={40} /><div className="font-display text-xl font-bold">{team.name}</div></div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Purse</div><div className="num text-xl font-bold text-gold">{taka(team.purse)}</div></div>
+            <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Squad</div><div className="num text-xl font-bold">{team.squadCount} / {team.maxPlayers}</div></div>
           </div>
-        )}
-      </div>
+          <div className="mt-2"><Progress value={team.squadCount} max={team.maxPlayers} tone={team.squadFull ? 'gold' : 'green'} /></div>
+          {team.squadFull && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-center font-display text-xl font-bold text-gold">SQUAD FULL</p>}
+        </>
+      )}
+      {a ? (
+        <div className="mt-4">
+          <div className="text-xs text-mist">Current bid</div>
+          <div className="num text-3xl font-bold text-gold">{taka(a.currentBid)}</div>
+          <div className="mt-1 text-sm text-mist">{a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : 'Waiting for the first bid'}</div>
+        </div>
+      ) : <p className="mt-4 text-sm text-mist">No player is on the block right now.</p>}
     </Card>
   );
 }
@@ -210,8 +185,8 @@ function BigScreen({ state, flash, teams, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
-    document.documentElement.requestFullscreen?.().catch(() => {});
-    return () => { window.removeEventListener('keydown', onKey); if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {}); };
+    document.documentElement.requestFullscreen?.().catch(() => { });
+    return () => { window.removeEventListener('keydown', onKey); if (document.fullscreenElement) document.exitFullscreen?.().catch(() => { }); };
   }, [onClose]);
   return (
     <div className="fixed inset-0 z-[80] min-h-screen overflow-y-auto bg-ink-950 p-4">
@@ -228,7 +203,7 @@ function BigScreen({ state, flash, teams, onClose }) {
 }
 
 export default function Auction({ admin }) {
-  const { user, isAdmin, isOwner } = useAuth();
+  const { isAdmin, isOwner } = useAuth();
   const { seasonId, season } = useSeason();
   const { state, connected, lastEvent, bid } = useAuction(seasonId);
   const [big, setBig] = useState(false);
@@ -287,7 +262,7 @@ export default function Auction({ admin }) {
         <div className="space-y-4">
           {showAdmin
             ? <AdminPanel state={state} seasonId={seasonId} players={players.data ?? []} teams={teams.data ?? []} bid={bid} reloadPlayers={() => { players.reload(); teams.reload(); }} />
-            : <OwnerPanel key={liveMine.map((t) => t.id).join()} state={state} myTeams={liveMine} bid={bid} user={isOwner ? user : null} />}
+            : <WatchPanel state={state} myTeams={liveMine} />}
           <TeamsStrip teams={teams.data} myTeamIds={myTeamIds} />
         </div>
       </div>
@@ -300,7 +275,7 @@ export default function Auction({ admin }) {
             <td className="td"><StatusBadge status={h.status} /></td>
             <td className="td">{h.status === 'SOLD' ? h.highestBidTeam?.name : '-'}</td>
             <td className="td num text-gold">{h.status === 'SOLD' ? taka(h.currentBid) : '-'}</td>
-            <td className="td">{h.bids.length}</td>
+            <td className="td">{h.assignedDirectly ? 'Assigned' : h.bids.length}</td>
             <td className="td text-mist">{dateTime(h.endedAt)}</td>
           </tr>
         ))}
