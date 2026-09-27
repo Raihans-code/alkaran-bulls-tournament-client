@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useFetch } from '../hooks/useFetch.js';
 import { useSeason } from '../context/SeasonContext.jsx';
@@ -21,9 +21,11 @@ export const NEXT_STATUS = {
 
 export function SeasonAdminPanel({ season, onChanged }) {
   const toast = useToast();
+  const navigate = useNavigate();
   const { refresh } = useSeason();
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   const changeStatus = async (status) => {
     setBusy(true);
@@ -34,6 +36,16 @@ export function SeasonAdminPanel({ season, onChanged }) {
     setBusy(true);
     try { await api.seasons.update(season.id, body); toast.success('Season saved'); await refresh(); onChanged?.(); }
     catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
+  };
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await api.seasons.remove(season.id);
+      toast.success(`${season.name} deleted`);
+      setDeleteConfirm(false);
+      await refresh(); // drops the stale id and picks another season
+      navigate('/admin/seasons');
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
   };
 
   return (
@@ -52,7 +64,24 @@ export function SeasonAdminPanel({ season, onChanged }) {
         <SeasonForm key={season.updatedAt} initial={season} onSubmit={save} busy={busy} submitLabel="Save settings" />
         <p className="mt-2 text-xs text-mist">Changing the team purse only affects teams registered afterwards. Adjust existing teams from Teams.</p>
       </Card>
+      {season.status === 'CANCELLED' && (
+        <Card className="border-alert/50">
+          <h2 className="mb-1 text-2xl font-bold text-red-200">Delete season</h2>
+          <p className="mb-3 text-sm text-mist">Permanently erases {season.name} and every team, player, auction and match that belongs to it, right out of the database. This cannot be undone.</p>
+          <Button variant="danger" size="sm" onClick={() => setDeleteConfirm(true)}>Delete season permanently</Button>
+        </Card>
+      )}
       <ConfirmDialog open={!!confirm} title={confirm?.[1]} message={`Move ${season.name} to ${confirm?.[0]?.toLowerCase()}?`} loading={busy} danger={confirm?.[0] === 'CANCELLED'} onClose={() => setConfirm(null)} onConfirm={() => changeStatus(confirm[0])} />
+      <ConfirmDialog
+        open={deleteConfirm}
+        title="Delete this season permanently?"
+        message={`This removes ${season.name} and all of its teams, players, auctions and matches from the database. There is no undo.`}
+        confirmLabel="Delete permanently"
+        loading={busy}
+        danger
+        onClose={() => setDeleteConfirm(false)}
+        onConfirm={remove}
+      />
     </div>
   );
 }

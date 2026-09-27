@@ -42,6 +42,7 @@ export const api = {
     create: (b) => post('/seasons', b),
     update: (id, b) => patch(`/seasons/${id}`, b),
     setStatus: (id, b) => post(`/seasons/${id}/status`, b),
+    remove: (id) => del(`/seasons/${id}`),
   },
   teams: {
     list: (seasonId, status) => get('/teams', { seasonId, status }),
