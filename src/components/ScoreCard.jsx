@@ -3,11 +3,11 @@ import { Card, StatusBadge } from './ui.jsx';
 import { dateTime } from '../utils/format.js';
 
 export function InningsLine({ innings, teamName, big }) {
-  if (!innings) return <div className="text-mist">{teamName}<span className="ml-2 text-sm">yet to bat</span></div>;
+  if (!innings) return <div className="flex min-w-0 items-baseline gap-2 text-mist"><span className="min-w-0 truncate">{teamName}</span><span className="shrink-0 text-sm">yet to bat</span></div>;
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className={`truncate font-semibold ${big ? 'text-2xl' : ''}`}>{teamName}</span>
-      <span className={`num font-bold ${big ? 'text-6xl' : 'text-2xl'}`}>
+      <span className={`min-w-0 truncate font-semibold ${big ? 'text-2xl' : ''}`} title={teamName}>{teamName}</span>
+      <span className={`num shrink-0 whitespace-nowrap font-bold ${big ? 'text-5xl sm:text-6xl' : 'text-2xl'}`}>
         {innings.runs}/{innings.wickets}
         <span className={`ml-2 font-normal text-mist ${big ? 'text-2xl' : 'text-sm'}`}>({innings.overs} ov)</span>
       </span>
@@ -25,8 +25,8 @@ export default function MatchCard({ match, to }) {
   return (
     <Card>
       <div className="mb-2 flex items-center justify-between text-xs text-mist">
-        <span>Match {match.matchNumber}{match.venue ? ` • ${match.venue}` : ''}</span>
-        <StatusBadge status={match.status} />
+        <span className="min-w-0 truncate">Match {match.matchNumber}{match.venue ? ` • ${match.venue}` : ''}</span>
+        <span className="shrink-0"><StatusBadge status={match.status} /></span>
       </div>
       <Link to={to ?? `/matches/${match.id}`} className="block space-y-1.5">
         <InningsLine innings={a} teamName={match.teamA.name} />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { initials, title } from '../utils/format.js';
 
 export const Button = ({ variant = 'primary', size, className = '', loading, children, ...rest }) => (
@@ -79,15 +79,43 @@ export const Stat = ({ label, value, tone }) => (
   </Card>
 );
 
-export const Table = ({ head, children, empty }) => (
-  <div className="max-w-full overflow-x-auto rounded-xl border border-ink-line [overscroll-behavior-x:contain]">
-    <table className="w-full min-w-[640px] border-collapse">
-      <thead><tr>{head.map((h) => <th key={h} className="th">{h}</th>)}</tr></thead>
-      <tbody>{children}</tbody>
-    </table>
-    {empty}
-  </div>
-);
+/**
+ * Data table. On phones (<640px) rows turn into stacked cards, each cell showing its column title,
+ * so nothing needs sideways scrolling. Pass `stack={false}` for compact numeric tables (e.g. standings)
+ * that should stay a real table; `head` entries may be `{ label, className }` to hide columns on small screens.
+ */
+export function Table({ head, children, empty, minWidth = '640px', stack = true }) {
+  const ref = useRef(null);
+  const cols = head.map((h) => (typeof h === 'string' ? { label: h } : h));
+  const key = cols.map((c) => c.label).join('|');
+
+  // Tag every cell with its column title so the CSS can print it in the stacked layout.
+  useLayoutEffect(() => {
+    const body = ref.current?.querySelector('tbody');
+    if (!stack || !body) return undefined;
+    const labels = key.split('|');
+    const apply = () => body.querySelectorAll(':scope > tr').forEach((tr) => {
+      Array.from(tr.children).forEach((td, i) => {
+        const label = td.colSpan > 1 ? '' : labels[i] || '';
+        if (label) { if (td.dataset.label !== label) td.dataset.label = label; } else if (td.dataset.label) delete td.dataset.label;
+      });
+    });
+    apply();
+    const observer = new MutationObserver(apply); // rows change while polling; attributes aren't observed, so no loop
+    observer.observe(body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [key, stack]);
+
+  return (
+    <div className="max-w-full overflow-x-auto rounded-xl border border-ink-line [overscroll-behavior-x:contain]">
+      <table ref={ref} className={`w-full border-collapse ${stack ? 'table-stack' : ''}`} style={{ minWidth }}>
+        <thead><tr>{cols.map((c, i) => <th key={i} className={`th ${c.className || ''}`}>{c.label}</th>)}</tr></thead>
+        <tbody>{children}</tbody>
+      </table>
+      {empty}
+    </div>
+  );
+}
 
 export function Modal({ open, onClose, title: t, children, wide }) {
   useEffect(() => {
