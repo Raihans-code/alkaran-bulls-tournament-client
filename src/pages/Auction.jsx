@@ -31,7 +31,7 @@ function Stage({ state, flash, big }) {
           <div className={`num mt-4 break-words font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-5xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
           <div className="mt-2 text-sm text-mist">Current bid</div>
           <div className={`mt-3 ${big ? 'text-3xl' : 'text-lg'} font-semibold`}>
-            {a.highestBidTeam ? <>Selected bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
+            {a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
           </div>
         </div>
       ) : (
@@ -129,27 +129,107 @@ function AdminPanel({ state, seasonId, players, teams, bid, reloadPlayers }) {
   );
 }
 
-// Team owners watch the auction exactly like any other viewer: bidding is admin-only,
-// so this panel is read-only for everyone who isn't the auctioneer (see AdminPanel).
-function WatchPanel({ state, myTeams }) {
+function OwnerPanel({ state, myTeams, bid }) {
+  const toast = useToast();
   const a = state?.auction;
-  const team = myTeams[0];
+  const [teamId, setTeamId] = useState(myTeams[0]?.id ?? '');
+  const [busy, setBusy] = useState(false);
+  const team = myTeams.find((t) => t.id === teamId) ?? myTeams[0];
+  const increments = state?.bidOptions?.length ? state.bidOptions : (state?.nextBid && a ? [state.nextBid - a.currentBid] : []);
+
+  useEffect(() => {
+    if (!myTeams.length) { setTeamId(''); return; }
+    if (!myTeams.some((t) => t.id === teamId)) setTeamId(myTeams[0].id);
+  }, [myTeams, teamId]);
+
+  const placeBid = async (amount) => {
+    if (!team || !a || busy) return;
+    setBusy(true);
+    try {
+      await bid(amount, team.id);
+      toast.success(`Bid placed for ${team.name}`);
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const disabledReason = !team
+    ? 'Select your team'
+    : team.squadFull
+      ? 'Your squad is full'
+      : !a
+        ? 'No live auction'
+        : a.highestBidTeam?.id === team.id
+          ? 'You are already highest bidder'
+          : null;
+
+  return (
+    <Card>
+      <h3 className="text-2xl font-bold">Owner bidding</h3>
+      <p className="mt-1 text-sm text-mist">Owners bid for approved teams only. You can buy at most one player per category.</p>
+      {!myTeams.length && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-sm text-gold">You do not have an approved team in this season.</p>}
+      {myTeams.length > 0 && (
+        <>
+          <Field label="Bid for team">
+            <select className="input" value={teamId} onChange={(e) => setTeamId(e.target.value)}>
+              {myTeams.map((t) => <option key={t.id} value={t.id}>{t.name} • {taka(t.purse)} purse</option>)}
+            </select>
+          </Field>
+          {team && (
+            <>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Purse</div><div className="num text-xl font-bold text-gold">{taka(team.purse)}</div></div>
+                <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Squad</div><div className="num text-xl font-bold">{team.squadCount} / {team.maxPlayers}</div></div>
+              </div>
+              <div className="mt-2"><Progress value={team.squadCount} max={team.maxPlayers} tone={team.squadFull ? 'gold' : 'green'} /></div>
+              {team.squadFull && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-center font-display text-xl font-bold text-gold">SQUAD FULL</p>}
+            </>
+          )}
+          {a ? (
+            <div className="mt-4 space-y-3">
+              <div>
+                <div className="text-xs text-mist">Current bid</div>
+                <div className="num text-3xl font-bold text-gold">{taka(a.currentBid)}</div>
+                <div className="mt-1 text-sm text-mist">{a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : 'Waiting for the first bid'}</div>
+              </div>
+              {!!increments.length && (
+                <div className="grid grid-cols-2 gap-2">
+                  {increments.map((step) => {
+                    const amount = a.currentBid + step;
+                    const disabled = !!disabledReason || team?.purse < amount;
+                    return (
+                      <Button
+                        key={step}
+                        variant="gold"
+                        className="bg-white text-ink-950 hover:bg-slate-100"
+                        disabled={disabled}
+                        loading={busy}
+                        onClick={() => placeBid(amount)}
+                      >
+                        {team?.purse < amount ? 'Insufficient purse' : `Bid ${taka(amount)}`}
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
+              {disabledReason && <p className="text-sm text-mist">{disabledReason}</p>}
+            </div>
+          ) : <p className="mt-4 text-sm text-mist">No player is on the block right now.</p>}
+        </>
+      )}
+    </Card>
+  );
+}
+
+function ViewerPanel({ state }) {
+  const a = state?.auction;
 
   return (
     <Card>
       <h3 className="text-2xl font-bold">Watching</h3>
-      <p className="mt-1 text-sm text-mist">Only the auctioneer places bids. Sit back and follow along{team ? ` — here's how ${team.name} stands.` : '.'}</p>
-      {team && (
-        <>
-          <div className="mt-3 flex items-center gap-3"><Avatar name={team.name} src={team.logo} size={40} /><div className="font-display text-xl font-bold">{team.name}</div></div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Purse</div><div className="num text-xl font-bold text-gold">{taka(team.purse)}</div></div>
-            <div className="rounded-lg bg-ink-700 p-3"><div className="text-xs text-mist">Squad</div><div className="num text-xl font-bold">{team.squadCount} / {team.maxPlayers}</div></div>
-          </div>
-          <div className="mt-2"><Progress value={team.squadCount} max={team.maxPlayers} tone={team.squadFull ? 'gold' : 'green'} /></div>
-          {team.squadFull && <p className="mt-3 rounded-lg bg-gold/10 p-3 text-center font-display text-xl font-bold text-gold">SQUAD FULL</p>}
-        </>
-      )}
+      <p className="mt-1 text-sm text-mist">Only owners and admins can place bids. Sit back and follow along.</p>
       {a ? (
         <div className="mt-4">
           <div className="text-xs text-mist">Current bid</div>
@@ -209,6 +289,7 @@ export default function Auction({ admin }) {
   const [big, setBig] = useState(false);
   const [flash, setFlash] = useState(null);
   const showAdmin = admin && isAdmin;
+  const showOwner = !showAdmin && isOwner;
 
   const teams = useFetch(() => (seasonId ? api.teams.list(seasonId, 'APPROVED') : null), [seasonId]);
   const mine = useFetch(() => (seasonId && isOwner && !isAdmin ? api.teams.mine(seasonId) : null), [seasonId, isOwner, isAdmin]);
@@ -262,7 +343,9 @@ export default function Auction({ admin }) {
         <div className="space-y-4">
           {showAdmin
             ? <AdminPanel state={state} seasonId={seasonId} players={players.data ?? []} teams={teams.data ?? []} bid={bid} reloadPlayers={() => { players.reload(); teams.reload(); }} />
-            : <WatchPanel state={state} myTeams={liveMine} />}
+            : showOwner
+              ? <OwnerPanel state={state} myTeams={liveMine} bid={bid} />
+              : <ViewerPanel state={state} />}
           <TeamsStrip teams={teams.data} myTeamIds={myTeamIds} />
         </div>
       </div>
