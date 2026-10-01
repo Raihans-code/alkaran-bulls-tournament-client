@@ -43,7 +43,7 @@ function Stage({ state, flash, big }) {
           </div>
           <div className={`num mt-6 break-words font-extrabold leading-none text-gold ${big ? 'text-[6rem] sm:text-[8rem]' : 'text-4xl sm:text-6xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
           <div className="mt-2 text-sm font-medium uppercase tracking-[0.28em] text-mist">Current bid</div>
-          <div className={`${big ? 'mt-4 text-3xl sm:text-4xl' : 'mt-3 text-xl'} font-semibold tracking-tight`}>
+          <div className={`${big ? 'mt-4 text-4xl sm:text-5xl' : 'mt-3 text-2xl'} font-semibold tracking-tight`}>
             {a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
           </div>
         </div>
@@ -52,11 +52,11 @@ function Stage({ state, flash, big }) {
           <img src="/bulls-logo.svg" alt="Alkaran Bulls" className={`${big ? 'h-28 w-28 md:h-36 md:w-36' : 'h-24 w-24'} drop-shadow-[0_0_30px_rgba(34,197,94,0.25)]`} />
           <p className={`mt-6 font-display font-bold ${big ? 'text-6xl' : 'text-3xl'}`}>Alkaran Bulls Auction</p>
           {last ? (
-            <p className="mt-4 max-w-2xl text-mist">
+            <p className={`${big ? 'mt-5 max-w-3xl text-2xl sm:text-3xl' : 'mt-4 max-w-2xl text-xl'} text-mist`}>
               Last player: <b className="text-white">{last.player?.name}</b> {last.status === 'SOLD' ? <>sold to <b className="text-pitch">{last.team?.name}</b> for <b className="text-gold">{taka(last.price)}</b></> : <>marked {last.status.toLowerCase()}</>}
             </p>
           ) : (
-            <p className="mt-4 max-w-2xl text-mist">The next player will appear here the moment the auctioneer starts the bidding.</p>
+            <p className={`${big ? 'mt-5 max-w-3xl text-2xl sm:text-3xl' : 'mt-4 max-w-2xl text-xl'} text-mist`}>The next player will appear here the moment the auctioneer starts the bidding.</p>
           )}
         </div>
       )}
@@ -217,7 +217,7 @@ function OwnerPanel({ state, myTeams, bid }) {
                       <Button
                         key={step}
                         variant="gold"
-                        className="bg-white text-ink-950 hover:bg-slate-100"
+                        className="bg-white py-4 text-base font-bold text-ink-950 hover:bg-slate-100 sm:py-5 sm:text-lg"
                         disabled={disabled}
                         loading={busy}
                         onClick={() => placeBid(amount)}
