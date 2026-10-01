@@ -21,28 +21,42 @@ function Stage({ state, flash, big }) {
         <div className={`absolute inset-x-0 top-0 z-10 py-3 font-display text-3xl font-extrabold tracking-wide ${flash.tone === 'green' ? 'bg-pitch text-ink-950' : 'bg-ink-600 text-white'}`} role="status">{flash.text}</div>
       )}
       {a ? (
-        <div>
+        <div className="w-full max-w-4xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-alert/50 bg-alert/15 px-3 py-1 text-xs font-bold text-red-200">
             <span className="h-2 w-2 animate-pulse rounded-full bg-alert" /> LIVE
           </span>
-          <div className="mt-4 flex justify-center"><Avatar name={a.player.name} src={a.player.image} size={big ? 260 : 104} className="shadow-2xl" /></div>
-          <h2 className={`mt-3 break-words font-bold leading-none ${big ? 'text-7xl' : 'text-3xl sm:text-5xl'}`}>{a.player.name}</h2>
-          <div className="mt-2 text-mist"><Badge tone="blue">{CATEGORY_LABEL[a.player.category]}</Badge> <span className="ml-2">Base {taka(a.basePrice)}</span></div>
-          <div className={`num mt-4 break-words font-extrabold leading-none text-gold ${big ? 'text-[9rem]' : 'text-5xl sm:text-7xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
-          <div className="mt-2 text-sm text-mist">Current bid</div>
-          <div className={`mt-3 ${big ? 'text-3xl' : 'text-lg'} font-semibold`}>
+          <div className="mt-5 flex justify-center">
+            <div className="rounded-[2rem] border border-emerald-300/30 bg-emerald-500/5 p-3 shadow-[0_0_60px_rgba(16,185,129,0.2)] backdrop-blur-sm">
+              <Avatar name={a.player.name} src={a.player.image} size={big ? 320 : 180} className="shadow-[0_0_30px_rgba(16,185,129,0.35)] ring-4 ring-emerald-300/20" />
+            </div>
+          </div>
+          <h2 className={`mt-5 break-words font-bold leading-none ${big ? 'text-6xl sm:text-7xl' : 'text-3xl sm:text-5xl'}`}>{a.player.name}</h2>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <div className="rounded-2xl border border-sky-400/40 bg-sky-500/10 px-4 py-3 text-left shadow-lg shadow-sky-500/5">
+              <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-200">Player tier</div>
+              <div className="mt-1 text-lg font-bold text-white sm:text-2xl">{CATEGORY_LABEL[a.player.category]}</div>
+            </div>
+            <div className="rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-left shadow-lg shadow-gold/5">
+              <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-gold">Base price</div>
+              <div className="mt-1 text-lg font-bold text-gold sm:text-2xl">{taka(a.basePrice)}</div>
+            </div>
+          </div>
+          <div className={`num mt-6 break-words font-extrabold leading-none text-gold ${big ? 'text-[6rem] sm:text-[8rem]' : 'text-4xl sm:text-6xl'}`} aria-live="polite">{taka(a.currentBid)}</div>
+          <div className="mt-2 text-sm font-medium uppercase tracking-[0.28em] text-mist">Current bid</div>
+          <div className={`${big ? 'mt-4 text-3xl sm:text-4xl' : 'mt-3 text-xl'} font-semibold tracking-tight`}>
             {a.highestBidTeam ? <>Highest bidder: <span className="text-pitch">{a.highestBidTeam.name}</span></> : <span className="text-mist">Waiting for the first bid</span>}
           </div>
         </div>
       ) : (
-        <div>
-          <p className={`font-display font-bold ${big ? 'text-6xl' : 'text-3xl'}`}>Alkaran Bulls Auction</p>
+        <div className="flex flex-col items-center justify-center">
+          <img src="/bulls-logo.svg" alt="Alkaran Bulls" className={`${big ? 'h-28 w-28 md:h-36 md:w-36' : 'h-24 w-24'} drop-shadow-[0_0_30px_rgba(34,197,94,0.25)]`} />
+          <p className={`mt-6 font-display font-bold ${big ? 'text-6xl' : 'text-3xl'}`}>Alkaran Bulls Auction</p>
           {last ? (
-            <p className="mt-3 text-mist">
+            <p className="mt-4 max-w-2xl text-mist">
               Last player: <b className="text-white">{last.player?.name}</b> {last.status === 'SOLD' ? <>sold to <b className="text-pitch">{last.team?.name}</b> for <b className="text-gold">{taka(last.price)}</b></> : <>marked {last.status.toLowerCase()}</>}
             </p>
           ) : (
-            <p className="mt-3 text-mist">The next player will appear here the moment the auctioneer starts the bidding.</p>
+            <p className="mt-4 max-w-2xl text-mist">The next player will appear here the moment the auctioneer starts the bidding.</p>
           )}
         </div>
       )}
